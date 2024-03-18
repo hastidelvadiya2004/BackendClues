@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: rgb(238, 249, 251);
+        }
+
+        .container {
+            position: relative;
+            text-align: left;
+        }
+
+        .content {
+            background-color: rgb(251, 222, 211);
+            border-radius: 5px;
+            color: black;
+            min-height: 50px;
+            padding: 20px;
+        }
+
+        .content::after {
+            content: "Copy";
+            color: #db1709;
+            background-color: rgb(233, 173, 145);
+            cursor: pointer;
+            padding: 5px 10px;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        .info {
+            color: #000;
+            font-size: 19px;
+        }
+
+        .textarea {
+            resize: none;
+        }
+
+        h1 {
+            color: #1ac3e5;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>This code is to add login and sign up facilities to your node js website</h1>
+    <p class="info">Install this packages.</p>
+    <section class="container">
+        <p class="content">
+            <code class="code">
+                    npm i mongoose passport passport-local passport-local-mongoose
+            </code>
+        </p>
+    </section>
+    <p class="info">Require this modules to app.js file</p>
+    <section class="container">
+        <p class="content">
+            <code class="code">
+                const expressSession = require("express-session")<br>
+                const passport = require('passport');
+            </code>
+        </p>
+    </section>
+    <p class="info">Add this code to app.js file</p>
+    <section class="container">
+        <p class="content">
+            <code class="code">
+                app.use(expressSession({<br>
+                    resave: false,<br>
+                    saveUninitialized: false,<br>
+                    secret: "heyheyhey"<br>
+                }))<br>
+                app.use(passport.initialize())<br>
+                app.use(passport.session())<br>
+                passport.serializeUser(usersRouter.serializeUser())<br>
+                passport.deserializeUser(usersRouter.deserializeUser())<br>
+            </code>
+        </p>
+    </section>
+    <p class="info">Add this code to users.js file</p>
+    <section class="container">
+        <p class="content">
+            <code class="code">
+                const mongoose = require('mongoose');<br>
+                const Schema = mongoose.Schema;<br>
+                const plm = require("passport-local-mongoose")<br>
+
+                mongoose.connect("mongodb://127.0.0.1:27017/pinterest");<br>
+
+                const userSchema = new Schema({<br>
+                    username: {<br>
+                        type: String,<br>
+                        required: true,<br>
+                        unique: true<br>
+                    },<br>
+                    password: {<br>
+                        type: String<br>
+                    }<br>
+                });<br>
+
+                userSchema.plugin(plm)<br>
+                module.exports = mongoose.model('User', userSchema);<br>
+
+            </code>
+        </p>
+    </section>
+    <p class="info" style="font-size: 29px;">Add this code snippets to index.js file</p>
+    <p class="info">This code is for register router to sign up.</p>
+    <section class="container">
+        <p class="content">
+            <code class="code">
+                const passport = require('passport');<br>
+                const localStrategy = require("passport-local")<br>
+                passport.use(new localStrategy(userModel.authenticate()))<br>
+
+                router.post("/register", function (req, res) {<br>
+                    const {username, email , fullname} = req.body<br>
+                    let userData = new userModel({username, email, fullname})<br>
+  
+                    userModel.register(userData, req.body.password)<br>
+                      .then(function(){<br>
+                        passport.authenticate("local")(req,res, function(){<br>
+                          res.redirect("/profile")<br>
+                        })<br>
+                      })<br>
+                  })<br>
+            </code>
+        </p>
+    </section>
+    <p class="info">This code is for login router to login in.</p>
+    <section class="container">
+        <p class="content">
+            <code class="code">
+                router.post("/login", passport.authenticate("local",{<br>
+                    successRedirect: "/profile",<br>
+                    failureRedirect: "/login",<br>
+                    failureFlash: true<br>
+                  }) ,function(req, res){<br>
+                  
+                  })<br>
+            </code>
+        </p>
+    </section>
+    <p class="info">This code is for logout router to logout.</p>
+    <section class="container">
+        <p class="content">
+            <code class="code">
+                router.get("/logout", function(req, res){<br>
+                    req.logout(function(err){<br>
+                      if(err) {return next(err)}<br>
+                      res.redirect("/login")<br>
+                    })<br>
+                  })<br>
+            </code>
+        </p>
+    </section>
+    <p class="info">This code is for isLoggedIn middleware.</p>
+    <section class="container">
+        <p class="content">
+            <code class="code">
+                function isloggedIn(req,res, next){<br>
+                    if(req.isAuthenticated()) return next();<br>
+                    res.redirect("/login")<br>
+                  }<br>
+            </code>
+        </p>
+    </section>
+    <script>
+        document.querySelectorAll(".content").forEach((item, index) => {
+            item.addEventListener("click", async (event) => {
+                if (!navigator.clipboard) {
+                    // Clipboard API not available
+                    return;
+                }
+                try {
+                    await navigator.clipboard.writeText(event.target.innerText);
+                } catch (err) {
+                    console.error("Failed to copy!", err);
+                }
+            });
+        });
+
+    </script>
+</body>
+
+</html>
